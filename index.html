@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Investment Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1><i class="fas fa-chart-line icon"></i> Advanced Investment Calculator</h1>
+    
+    <div class="tab-buttons">
+        <button class="active" data-tab="single">Single Index</button>
+        <button data-tab="comparison">Index Comparison</button>
+    </div>
+
+    <div id="singleTab" class="tab-content active">
+        <div class="input-group">
+            <div class="button-group">
+                <button class="mode-button active" data-mode="past"><i class="fas fa-history icon"></i> Past</button>
+                <button class="mode-button" data-mode="future"><i class="fas fa-forward icon"></i> Future</button>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-calendar-alt icon"></i> Start Date: <input type="date" id="startDate"></label>
+            <label><i class="fas fa-calendar-check icon"></i> End Date: <input type="date" id="endDate"></label>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-dollar-sign icon"></i> Monthly Investment ($): 
+                <input type="range" id="investmentSlider" min="1" max="2000" step="1" value="500">
+                <input type="number" id="investmentInput" min="1" max="2000" value="500">
+            </label>
+        </div>
+        
+        <div class="input-group">
+            <div class="button-group">
+                <button class="interest-button active" data-interest="compound"><i class="fas fa-chart-line icon"></i> Compound</button>
+                <button class="interest-button" data-interest="simple"><i class="fas fa-chart-bar icon"></i> Simple</button>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-globe icon"></i> Select Index:
+                <select id="indexSelect">
+                    <option value="SP500">S&P 500 (US) - Moderate Risk</option>
+                    <option value="STOXX600">STOXX 600 (Europe) - Moderate Risk</option>
+                    <option value="NIKKEI225">Nikkei 225 (Japan) - Moderate Risk</option>
+                    <option value="MSCIWORLD">MSCI World - Moderate Risk</option>
+                    <option value="NASDAQ">NASDAQ - High Risk</option>
+                    <option value="RUSSELL2000">Russell 2000 - High Risk</option>
+                    <option value="CUSTOM">Custom Return Rate</option>
+                </select>
+            </label>
+            <div id="customRateInput" style="display: none;">
+                <label>Custom Annual Return Rate (%): <input type="number" id="customRate" min="0" max="100" step="0.1" value="7"></label>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-percentage icon"></i> Inflation Rate (%):
+                <input type="number" id="inflationRate" min="0" max="20" step="0.1" value="2">
+            </label>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-file-invoice-dollar icon"></i> Tax Option:
+                <select id="taxOption">
+                    <option value="none">No Tax</option>
+                    <option value="us">US Tax</option>
+                    <option value="germany">Germany Tax</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-bullseye icon"></i> Goal Amount ($):
+                <input type="number" id="goalAmount" min="0" step="1000" value="0">
+            </label>
+        </div>
+        
+        <button onclick="calculate()"><i class="fas fa-calculator icon"></i> Calculate</button>
+        
+        <div id="results"></div>
+        
+        <canvas id="chart"></canvas>
+    </div>
+
+    <div id="comparisonTab" class="tab-content">
+        <!-- Comparison mode content here -->
+        <p>Comparison mode is under development. Check back soon!</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

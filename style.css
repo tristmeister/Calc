@@ -1,0 +1,130 @@
+:root {
+    --bright-green: #4CAF50;
+    --dark-gray: #333;
+    --light-gray: #f0f0f0;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+}
+h1 {
+    color: var(--bright-green);
+    text-align: center;
+}
+.input-group {
+    margin-bottom: 20px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+input[type="date"], input[type="number"], select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+input[type="range"] {
+    width: 100%;
+    margin-top: 10px;
+}
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+.button-group button {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--bright-green);
+    background-color: white;
+    color: var(--bright-green);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.button-group button.active {
+    background-color: var(--bright-green);
+    color: white;
+}
+.button-group button:first-child {
+    border-radius: 4px 0 0 4px;
+}
+.button-group button:last-child {
+    border-radius: 0 4px 4px 0;
+}
+button {
+    background-color: var(--bright-green);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #45a049;
+}
+#results {
+    margin-top: 20px;
+    font-weight: bold;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.result-value {
+    font-size: 1.2em;
+    color: var(--bright-green);
+}
+canvas {
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.icon {
+    margin-right: 5px;
+}
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.tab-buttons button {
+    background-color: white;
+    color: var(--dark-gray);
+    border: 1px solid var(--dark-gray);
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.tab-buttons button.active {
+    background-color: var(--bright-green);
+    color: white;
+    border-color: var(--bright-green);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .input-group {
+        padding: 10px;
+    }
+}
