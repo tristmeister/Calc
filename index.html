@@ -137,9 +137,79 @@
                 padding: 10px;
             }
         }
+        	.index-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .index-card {
+            background-color: white;
+            border: 2px solid var(--bright-green);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .index-card.active {
+            background-color: var(--bright-green);
+            color: white;
+        }
+        .index-card i {
+            margin-right: 5px;
+        }
+        #comparisonChart {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
+    <h1><i class="fas fa-chart-line icon"></i> Advanced Investment Calculator</h1>
+    
+    <div class="tab-buttons">
+        <button class="active" data-tab="single">Single Index</button>
+        <button data-tab="comparison">Index Comparison</button>
+    </div>
+
+    <div id="singleTab" class="tab-content active">
+        <!-- ... (keep the existing single tab content) ... -->
+    </div>
+
+    <div id="comparisonTab" class="tab-content">
+        <div class="input-group">
+            <div class="button-group">
+                <button class="mode-button active" data-mode="past"><i class="fas fa-history icon"></i> Past</button>
+                <button class="mode-button" data-mode="future"><i class="fas fa-forward icon"></i> Future</button>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-calendar-alt icon"></i> Start Date: <input type="date" id="comparisonStartDate"></label>
+            <label><i class="fas fa-calendar-check icon"></i> End Date: <input type="date" id="comparisonEndDate"></label>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-dollar-sign icon"></i> Monthly Investment ($): 
+                <input type="range" id="comparisonInvestmentSlider" min="1" max="2000" step="1" value="500">
+                <input type="number" id="comparisonInvestmentInput" min="1" max="2000" value="500">
+            </label>
+        </div>
+
+        <div class="index-cards">
+            <div class="index-card" data-index="SP500"><i class="fas fa-chart-line"></i> S&P 500</div>
+            <div class="index-card" data-index="STOXX600"><i class="fas fa-chart-line"></i> STOXX 600</div>
+            <div class="index-card" data-index="NIKKEI225"><i class="fas fa-chart-line"></i> Nikkei 225</div>
+            <div class="index-card" data-index="MSCIWORLD"><i class="fas fa-chart-line"></i> MSCI World</div>
+            <div class="index-card" data-index="NASDAQ"><i class="fas fa-chart-line"></i> NASDAQ</div>
+            <div class="index-card" data-index="RUSSELL2000"><i class="fas fa-chart-line"></i> Russell 2000</div>
+        </div>
+
+        <canvas id="comparisonChart"></canvas>
+    </div>	
+
     <h1><i class="fas fa-chart-line icon"></i> Advanced Investment Calculator</h1>
     
     <div class="tab-buttons">
@@ -423,6 +493,136 @@
             // This function will be implemented when the comparison mode is developed
             console.log("Compare indexes functionality to be implemented");
         }
+                // Add new variables for comparison tab
+        const comparisonStartDateInput = document.getElementById('comparisonStartDate');
+        const comparisonEndDateInput = document.getElementById('comparisonEndDate');
+        const comparisonInvestmentSlider = document.getElementById('comparisonInvestmentSlider');
+        const comparisonInvestmentInput = document.getElementById('comparisonInvestmentInput');
+        const indexCards = document.querySelectorAll('.index-card');
+        const comparisonChartCtx = document.getElementById('comparisonChart').getContext('2d');
+        let comparisonChart;
+        let selectedIndexes = [];
+
+        // Set default dates for comparison tab
+        comparisonStartDateInput.value = startDateInput.value;
+        comparisonEndDateInput.value = endDateInput.value;
+
+        // Sync slider and input for comparison tab
+        comparisonInvestmentSlider.addEventListener('input', () => comparisonInvestmentInput.value = comparisonInvestmentSlider.value);
+        comparisonInvestmentInput.addEventListener('input', () => comparisonInvestmentSlider.value = comparisonInvestmentInput.value);
+
+        // Index card selection functionality
+        indexCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if (card.classList.contains('active')) {
+                    card.classList.remove('active');
+                    selectedIndexes = selectedIndexes.filter(index => index !== card.dataset.index);
+                } else if (selectedIndexes.length < 3) {
+                    card.classList.add('active');
+                    selectedIndexes.push(card.dataset.index);
+                }
+                compareIndexes();
+            });
+        });
+
+        function compareIndexes() {
+            const startDate = new Date(comparisonStartDateInput.value);
+            const endDate = new Date(comparisonEndDateInput.value);
+            const monthlyInvestment = parseFloat(comparisonInvestmentInput.value);
+            const mode = document.querySelector('#comparisonTab .mode-button.active').dataset.mode;
+
+            const datasets = selectedIndexes.map(index => {
+                const annualReturn = annualReturns[index][mode];
+                const monthlyReturn = Math.pow(1 + annualReturn, 1/12) - 1;
+                let total = 0;
+                const dataPoints = [];
+
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    total = (total + monthlyInvestment) * (1 + monthlyReturn);
+                    dataPoints.push(total);
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+
+                return {
+                    label: index,
+                    data: dataPoints,
+                    borderColor: getRandomColor(),
+                    fill: false
+                };
+            });
+
+            const labels = [];
+            let currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                labels.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+
+            comparisonChart = new Chart(comparisonChartCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Add event listeners for real-time updates in comparison tab
+        document.querySelectorAll('#comparisonTab input, #comparisonTab select').forEach(element => {
+            element.addEventListener('change', compareIndexes);
+        });
+
+        // Update comparison tab when switching tabs
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.dataset.tab === 'comparison') {
+                    compareIndexes();
+                }
+            });
+        });
     </script>
 </body>
 </html>
