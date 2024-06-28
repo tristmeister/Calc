@@ -178,38 +178,6 @@
         <!-- ... (keep the existing single tab content) ... -->
     </div>
 
-    <div id="comparisonTab" class="tab-content">
-        <div class="input-group">
-            <div class="button-group">
-                <button class="mode-button active" data-mode="past"><i class="fas fa-history icon"></i> Past</button>
-                <button class="mode-button" data-mode="future"><i class="fas fa-forward icon"></i> Future</button>
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label><i class="fas fa-calendar-alt icon"></i> Start Date: <input type="date" id="comparisonStartDate"></label>
-            <label><i class="fas fa-calendar-check icon"></i> End Date: <input type="date" id="comparisonEndDate"></label>
-        </div>
-        
-        <div class="input-group">
-            <label><i class="fas fa-dollar-sign icon"></i> Monthly Investment ($): 
-                <input type="range" id="comparisonInvestmentSlider" min="1" max="2000" step="1" value="500">
-                <input type="number" id="comparisonInvestmentInput" min="1" max="2000" value="500">
-            </label>
-        </div>
-
-        <div class="index-cards">
-            <div class="index-card" data-index="SP500"><i class="fas fa-chart-line"></i> S&P 500</div>
-            <div class="index-card" data-index="STOXX600"><i class="fas fa-chart-line"></i> STOXX 600</div>
-            <div class="index-card" data-index="NIKKEI225"><i class="fas fa-chart-line"></i> Nikkei 225</div>
-            <div class="index-card" data-index="MSCIWORLD"><i class="fas fa-chart-line"></i> MSCI World</div>
-            <div class="index-card" data-index="NASDAQ"><i class="fas fa-chart-line"></i> NASDAQ</div>
-            <div class="index-card" data-index="RUSSELL2000"><i class="fas fa-chart-line"></i> Russell 2000</div>
-        </div>
-
-        <canvas id="comparisonChart"></canvas>
-    </div>	
-
     <h1><i class="fas fa-chart-line icon"></i> Advanced Investment Calculator</h1>
     
     <div class="tab-buttons">
@@ -291,8 +259,35 @@
     </div>
 
     <div id="comparisonTab" class="tab-content">
-        <!-- Comparison mode content here -->
-        <p>Comparison mode is under development. Check back soon!</p>
+        <div class="input-group">
+            <div class="button-group">
+                <button class="mode-button active" data-mode="past"><i class="fas fa-history icon"></i> Past</button>
+                <button class="mode-button" data-mode="future"><i class="fas fa-forward icon"></i> Future</button>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-calendar-alt icon"></i> Start Date: <input type="date" id="comparisonStartDate"></label>
+            <label><i class="fas fa-calendar-check icon"></i> End Date: <input type="date" id="comparisonEndDate"></label>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-dollar-sign icon"></i> Monthly Investment ($): 
+                <input type="range" id="comparisonInvestmentSlider" min="1" max="2000" step="1" value="500">
+                <input type="number" id="comparisonInvestmentInput" min="1" max="2000" value="500">
+            </label>
+        </div>
+
+        <div class="index-cards">
+            <div class="index-card" data-index="SP500"><i class="fas fa-chart-line"></i> S&P 500</div>
+            <div class="index-card" data-index="STOXX600"><i class="fas fa-chart-line"></i> STOXX 600</div>
+            <div class="index-card" data-index="NIKKEI225"><i class="fas fa-chart-line"></i> Nikkei 225</div>
+            <div class="index-card" data-index="MSCIWORLD"><i class="fas fa-chart-line"></i> MSCI World</div>
+            <div class="index-card" data-index="NASDAQ"><i class="fas fa-chart-line"></i> NASDAQ</div>
+            <div class="index-card" data-index="RUSSELL2000"><i class="fas fa-chart-line"></i> Russell 2000</div>
+        </div>
+
+        <canvas id="comparisonChart"></canvas>
     </div>
 
     <script>
@@ -488,12 +483,9 @@
             element.addEventListener('change', calculate);
         });
 
-        // Comparison mode functionality (placeholder)
-        function compareIndexes() {
-            // This function will be implemented when the comparison mode is developed
-            console.log("Compare indexes functionality to be implemented");
-        }
-                // Add new variables for comparison tab
+        // ... (Comparisson Tab) ...
+
+        // Add new variables for comparison tab
         const comparisonStartDateInput = document.getElementById('comparisonStartDate');
         const comparisonEndDateInput = document.getElementById('comparisonEndDate');
         const comparisonInvestmentSlider = document.getElementById('comparisonInvestmentSlider');
@@ -508,8 +500,14 @@
         comparisonEndDateInput.value = endDateInput.value;
 
         // Sync slider and input for comparison tab
-        comparisonInvestmentSlider.addEventListener('input', () => comparisonInvestmentInput.value = comparisonInvestmentSlider.value);
-        comparisonInvestmentInput.addEventListener('input', () => comparisonInvestmentSlider.value = comparisonInvestmentInput.value);
+        comparisonInvestmentSlider.addEventListener('input', () => {
+            comparisonInvestmentInput.value = comparisonInvestmentSlider.value;
+            compareIndexes();
+        });
+        comparisonInvestmentInput.addEventListener('input', () => {
+            comparisonInvestmentSlider.value = comparisonInvestmentInput.value;
+            compareIndexes();
+        });
 
         // Index card selection functionality
         indexCards.forEach(card => {
@@ -526,6 +524,8 @@
         });
 
         function compareIndexes() {
+            if (selectedIndexes.length === 0) return;
+
             const startDate = new Date(comparisonStartDateInput.value);
             const endDate = new Date(comparisonEndDateInput.value);
             const monthlyInvestment = parseFloat(comparisonInvestmentInput.value);
@@ -618,11 +618,23 @@
         // Update comparison tab when switching tabs
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
-                if (button.dataset.tab === 'comparison') {
+                const tabName = button.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(`${tabName}Tab`).classList.add('active');
+                
+                if (tabName === 'comparison') {
                     compareIndexes();
+                } else {
+                    calculate();
                 }
             });
         });
+
+        // Initial calculations
+        calculate();
+        compareIndexes();
     </script>
 </body>
 </html>
